@@ -800,7 +800,9 @@ float rand_normal();
 float rand_uniform(float min, float max);
 
 void predict_main(int argc, char **argv);
-
+void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *filename, float thresh, float hier_thresh, char *outfile, int fullscreen, char *datasetPath);
+void setGPU(int argc, char **argv);
+int predict_kevin(network *net,char **names,image **alphabet,char *outfile,char *filename, float thresh, float hier_thresh);
 #ifdef __cplusplus
 }
 #endif
