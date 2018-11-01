@@ -8,23 +8,23 @@ For more information see the [Darknet project website](http://pjreddie.com/darkn
 For questions or issues please use the [Google Group](https://groups.google.com/forum/#!forum/darknet).
 
 ### modify for caculating recall
-usage:
+## usage:
 
 	./darknet
 
-note: 
+## note: 
 
 1. Pic folder path should be modified
 
 2. weights file path should be modified
 
-major modification:
+## major modification:
 
 1.modify darknet.c to relealize a simple function for detection
 
 2.add function to read lines in a txt file (for reading Pos and Neg image in different folder)
 
-usage detail:
+## usage detail:
 
 1.fisrt put Pos and Neg images in different folders and generate txt files which contain full path name of Pos or Neg Pics
 
@@ -34,7 +34,7 @@ usage detail:
 
 4.modify several path name in darknet.c function -> mian()
 
-some explanation for the parameters:
+## some explanation for the parameters:
 
 datasetPath_kevin: folder path (which contain Pos and Neg pic and txt file,txt files should be placed in the exact folder should not be placed insider some folder in datasetPath_kevin)
 
