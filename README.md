@@ -44,3 +44,21 @@ filename: useless but should be given something (a string for example)
 
 0, 0: char *outfile(should be assigned 0 right in this time ,TO DO LIST in the future to realize saving pic after detection), int fullscreen
 
+## log
+
+### 20181106:
+
+train darknet for detecting excavator, use complete different datasets for training and val and test ,the result turns out to be disappointed...
+
+detect (test) and (val) dataset:
+
+tp: 150.000000 , fn: 46.000000
+
+tn: 0.000000 , fp: 0.000000 
+
+fakeTest: 12 , fakeTestPercent: 0.14 , fakeVal: 34 , fakeValPercent: 0.30
+
+recall = 76.53%  accuracy = 76.53%  precise = 100.00%
+
+
+

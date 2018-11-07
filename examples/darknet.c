@@ -28,7 +28,7 @@ int predict_kevin(network *net,char **names,image **alphabet,char *outfile,char 
     float *X = sized.data;
     double time=what_time_is_it_now();
     network_predict(net, X);
-    printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now()-time);
+    //printf("%s: Predicted in %f seconds.\n", input, what_time_is_it_now()-time);
     
     detection *dets = get_network_boxes(net, im.w, im.h, thresh, hier_thresh, 0, 1, &nboxes);
     //printf("%d\n", nboxes);
@@ -82,7 +82,8 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
     //--------------------
     float tp,fp,tn,fn,ImageCount;
     tp=0;fp=0;tn=0;fn=0;ImageCount=0;
-    char PosTxtPath[100],NegTxtPath[100],TestTxtPath[100];
+    char ValTxtPath[100],NegTxtPath[100],TestTxtPath[100],TrainTxtPath[100];
+    int fakeVal,fakeTest,CountVal,CountTest;fakeVal=0;fakeTest=0;CountTest=0;CountVal=0;
     //--------------------
     image **alphabet = load_alphabet();
     network *net = load_network(cfgfile, weightfile, 0);
@@ -94,13 +95,13 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
     //printf("number of detection: %d\n",NumberOfExcavatorDetected);
     
     //3. caculate tp,fp,tn,fn
-    strcpy(PosTxtPath,datasetPath);strcpy(NegTxtPath,datasetPath);strcpy(TestTxtPath,datasetPath);
-    strcat(PosTxtPath,"Posnamelist.txt");strcat(NegTxtPath,"Negnamelist.txt");strcat(TestTxtPath,"testnamelist.txt");
+    strcpy(ValTxtPath,datasetPath);strcpy(NegTxtPath,datasetPath);strcpy(TestTxtPath,datasetPath);strcpy(TrainTxtPath,datasetPath);
+    strcat(ValTxtPath,"Valnamelist.txt");strcat(NegTxtPath,"Negnamelist.txt");strcat(TestTxtPath,"Testnamelist.txt");strcat(TrainTxtPath,"Trainnamelist.txt");
     printf("TestTxtPath: %s\n",TestTxtPath);
     
     char szTest[1000] = {0};
     
-    /*
+    
     //TestTxtPath
     FILE *txtFile = fopen(TestTxtPath, "r");  
     if(NULL == txtFile)
@@ -114,39 +115,75 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
         fgets(szTest, sizeof(szTest) - 1, txtFile); // 包含了\n  
 	szTest[strlen(szTest)-1]=0;
 	if(strlen(szTest)==0 || strlen(szTest)==1) break;
+        //printf("%s ", szTest); 
+	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
+	CountTest++;
+	//printf("number of detection: %d\n",NumberOfExcavatorDetected);
+	if(NumberOfExcavatorDetected){tp++;}
+	else {
+	  fn++;
+	  fakeTest++;
+	  printf("wrong Test -> Neg: %s\n ", szTest); 
+	  //printf("number of detection: %d\n",NumberOfExcavatorDetected);
+	}
+    }  
+    fclose(txtFile);     
+    printf("\nTest ok\n");
+    /*
+    //TrainTxtPath
+    FILE *TraintxtFile = fopen(TrainTxtPath, "r");  
+    if(NULL == TraintxtFile)
+    {  
+        printf("failed to open dos.txt\n");  
+        return ;  
+    }
+    while(!feof(TraintxtFile))  
+    {  
+        memset(szTest, 0, sizeof(szTest));  
+        fgets(szTest, sizeof(szTest) - 1, TraintxtFile); // 包含了\n  
+	szTest[strlen(szTest)-1]=0;
+	if(strlen(szTest)==0 || strlen(szTest)==1) break;
         printf("%s ", szTest); 
 	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
 	printf("number of detection: %d\n",NumberOfExcavatorDetected);
-    }  
-    fclose(txtFile);     
-    printf("\nTest ok\n");*/
-    
-    //PosTxtPath
-    FILE *PostxtFile = fopen(PosTxtPath, "r");  
-    if(NULL == PostxtFile)
-    {  
-        printf("failed to open pos.txt\n");  
-        return ;  
-    }
-    while(!feof(PostxtFile))  
-    {  
-        memset(szTest, 0, sizeof(szTest));  
-        fgets(szTest, sizeof(szTest) - 1, PostxtFile); // 包含了\n  
-	szTest[strlen(szTest)-1]=0;
-	if(strlen(szTest)==0 || strlen(szTest)==1) break;
-        //printf("%s ", szTest); 
-	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
-	printf("Pos number of detection: %d\n",NumberOfExcavatorDetected);
 	if(NumberOfExcavatorDetected){tp++;}
 	else {
 	  fn++;
 	  printf("wrong Pos -> Neg: %s ", szTest); 
 	}
     }  
-    fclose(PostxtFile);
+    fclose(TraintxtFile);     
+    printf("\nTrain ok\n");*/
+    
+    //ValTxtPath
+    FILE *ValtxtFile = fopen(ValTxtPath, "r");  
+    if(NULL == ValtxtFile)
+    {  
+        printf("failed to open pos.txt\n");  
+        return ;  
+    }
+    while(!feof(ValtxtFile))  
+    {  
+        memset(szTest, 0, sizeof(szTest));  
+        fgets(szTest, sizeof(szTest) - 1, ValtxtFile); // 包含了\n  
+	szTest[strlen(szTest)-1]=0;
+	if(strlen(szTest)==0 || strlen(szTest)==1) break;
+        //printf("%s ", szTest); 
+	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
+	CountVal++;
+	//printf("Pos number of detection: %d\n",NumberOfExcavatorDetected);
+	if(NumberOfExcavatorDetected){tp++;}
+	else {
+	  fn++;
+	  fakeVal++;
+	  printf("Val number of detection: %d\n",NumberOfExcavatorDetected);
+	  //printf("wrong Val -> Neg: %s ", szTest); 
+	}
+    }  
+    fclose(ValtxtFile);
     
     printf("\nPos ok\n");
-    
+    /*
     //NegTxtPath
     FILE *NegtxtFile = fopen(NegTxtPath, "r");  
     if(NULL == NegtxtFile)
@@ -171,14 +208,15 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
     }  
     fclose(NegtxtFile);     
 
-    printf("\nNeg ok\n");
+    printf("\nNeg ok\n");*/
     
     printf("tp: %f , fn: %f \n",tp,fn);
     printf("tn: %f , fp: %f \n",tn,fp);
+    printf("fakeTest: %d , fakeTestPercent: %.2f , fakeVal: %d , fakeValPercent: %.2f\n",fakeTest,((float)fakeTest/(float)CountTest), fakeVal,((float)fakeVal/(float)CountVal));
     float recall = tp/(tp+fn)*100;
     float accuracy = (tp+tn)/(tp+tn+fn+fp)*100;
     float precise = tp/(tp+fp)*100;
-    printf("recall = %.2f%%  accuracy = %.2f%%  precise = %.2f%%",recall,accuracy,precise);
+    printf("recall = %.2f%%  accuracy = %.2f%%  precise = %.2f%%\n",recall,accuracy,precise);
     
 }
 
@@ -205,7 +243,7 @@ int  main(int argc, char **argv)
     //run_detector(argc, argv);
     char *datacfg_kevin = "cfg/voc.data";
     char *cfgfile_kevin = "cfg/yolov3-voc.cfg";
-    char *weightfile_kevin = "../../20181015Excavator/0detect_result/result_weights/20181101/yolov3-voc_final.weights";
+    char *weightfile_kevin = "/home/kevin/workspace/20181015Excavator/0detect_result/result_weights/20181106_diffDays/yolov3-voc_final.weights";
     char *datasetPath_kevin = "/home/kevin/workspace/20181015Excavator/original_dataset/dataset_underUsing/";
     char *filename = "/home/kevin/workspace/20181015Excavator/original_dataset/dataset_underUsing/Pos/09_DJI_00161.jpg";
     char *outfile_kevin = "/home/kevin/workspace/20181015Excavator/original_dataset/dataset_underUsing/09_DJI_00161.jpg";
