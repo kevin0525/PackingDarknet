@@ -48,6 +48,12 @@ int predict_kevin(network *net,char **names,image **alphabet,char *outfile,char 
 
     }
     //-------------------------------------
+    if(nboxes_higher_than_thresh){
+#ifdef OPENCV
+	//make_window("predictions", 512, 512, 0);
+	//show_image(im, "predictions", 0);
+#endif
+    }
     free_detections(dets, nboxes);
     if(outfile){
 	//save_image(im, outfile);
@@ -97,7 +103,7 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
     //3. caculate tp,fp,tn,fn
     strcpy(ValTxtPath,datasetPath);strcpy(NegTxtPath,datasetPath);strcpy(TestTxtPath,datasetPath);strcpy(TrainTxtPath,datasetPath);
     strcat(ValTxtPath,"Valnamelist.txt");strcat(NegTxtPath,"Negnamelist.txt");strcat(TestTxtPath,"Testnamelist.txt");strcat(TrainTxtPath,"Trainnamelist.txt");
-    printf("TestTxtPath: %s\n",TestTxtPath);
+    //printf("TestTxtPath: %s\n",TestTxtPath);
     
     char szTest[1000] = {0};
     
@@ -129,6 +135,7 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
     }  
     fclose(txtFile);     
     printf("\nTest ok\n");
+    
     /*
     //TrainTxtPath
     FILE *TraintxtFile = fopen(TrainTxtPath, "r");  
@@ -143,17 +150,18 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
         fgets(szTest, sizeof(szTest) - 1, TraintxtFile); // 包含了\n  
 	szTest[strlen(szTest)-1]=0;
 	if(strlen(szTest)==0 || strlen(szTest)==1) break;
-        printf("%s ", szTest); 
+        //printf("%s ", szTest); 
 	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
-	printf("number of detection: %d\n",NumberOfExcavatorDetected);
+	//printf("number of detection: %d\n",NumberOfExcavatorDetected);
 	if(NumberOfExcavatorDetected){tp++;}
 	else {
 	  fn++;
-	  printf("wrong Pos -> Neg: %s ", szTest); 
+	  printf("wrong Pos -> Neg: %s \n", szTest); 
 	}
     }  
     fclose(TraintxtFile);     
-    printf("\nTrain ok\n");*/
+    printf("\nTrain ok\n");
+    */
     
     //ValTxtPath
     FILE *ValtxtFile = fopen(ValTxtPath, "r");  
@@ -176,14 +184,15 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
 	else {
 	  fn++;
 	  fakeVal++;
-	  printf("Val number of detection: %d\n",NumberOfExcavatorDetected);
-	  //printf("wrong Val -> Neg: %s ", szTest); 
+	  //printf("Val number of detection: %d\n",NumberOfExcavatorDetected);
+	  printf("wrong Val -> Neg: %s \n", szTest); 
 	}
     }  
     fclose(ValtxtFile);
     
-    printf("\nPos ok\n");
-    /*
+    printf("\nVal ok\n");
+    
+    
     //NegTxtPath
     FILE *NegtxtFile = fopen(NegTxtPath, "r");  
     if(NULL == NegtxtFile)
@@ -199,16 +208,16 @@ void test_detector_kevin(char *datacfg, char *cfgfile, char *weightfile, char *f
 	if(strlen(szTest)==0 || strlen(szTest)==1) break;
         //printf("%s ", szTest); 
 	int NumberOfExcavatorDetected= predict_kevin(net,names,alphabet,outfile,szTest,thresh,hier_thresh);
-	printf("Neg number of detection: %d\n",NumberOfExcavatorDetected);
+	//printf("Neg number of detection: %d\n",NumberOfExcavatorDetected);
 	if(NumberOfExcavatorDetected==0){tn++;}
 	else {
 	  fp++;
-	  printf("wrong Neg -> Pos: %s ", szTest); 
+	  printf("wrong Neg -> Pos: %s \n", szTest); 
 	}
     }  
     fclose(NegtxtFile);     
 
-    printf("\nNeg ok\n");*/
+    printf("\nNeg ok\n");
     
     printf("tp: %f , fn: %f \n",tp,fn);
     printf("tn: %f , fp: %f \n",tn,fp);
